@@ -22,102 +22,137 @@
 
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
 
-
+    <!-- Toggle -->
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
     <style>
         body {
-            background-image: url(bk.jpg);
-            background-size: cover;
+            padding-top: 10px;
+            background-color: #1c506f;
         }
 
     </style>
+
 </head>
 
 <body>
     <div class="container">
         <div class="panel panel-default">
             <div class="panel-body">
-                <form class="form-inline" role="form">
-                    <h4 class="text-center">Stock Market Search</h4>
-                    <div class="form-group">
-                        <label class="control-label">
-                            Enter the stock name or symbol:<span style="color:red;">*</span>
+                <h4 class="text-center">Stock Market Search</h4>
+                <form class="form" role="form">
+
+                    <div class="form-group col-lg-9">
+                        <label class="control-label col-lg-4">
+                            Enter the stock name or symbol:<span style="color:red">*</span>
                         </label>
-
-                        <input type="text" class="form-control" name="company" placeholder="Apple Inc or AAPL" required autofocus>
-
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" name="company" placeholder="Apple Inc or AAPL" required autofocus>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Get Quote</button>
-                    <button type="reset" class="btn btn-default" onclick="resetForm()"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
+                    <div class="form-group col-lg-3">
+                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Get Quote</button>
+                        <button type="reset" class="btn btn-default" onclick="resetForm()"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
+                    </div>
+
+
                 </form>
 
-                <div class="pull-right">
+                <div class="col-lg-offset-9 col-lg-3">
                     <label class="control-label">Powered By: </label>
-                    <a href="https://www.markit.com/product/markit-on-demand"><img src="http://cs-server.usc.edu:45678/hw/hw8/images/mod-logo.png" height="22" width="200"></a>
+                    <a href="https://www.markit.com/product/markit-on-demand"><img src="http://cs-server.usc.edu:45678/hw/hw8/images/mod-logo.png" height="17" width="150"></a>
                 </div>
             </div>
         </div>
 
         <hr>
 
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <label>Favorite List</label>
-                        <div class="pull-right">
-                            Automatic Refresh:
-                            <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
-                            <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
-                        </div>
-                    </div>
-                    <div class="panel-body">
+        <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+                <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                <li data-target="#myCarousel" data-slide-to="1"></li>
+            </ol>
 
-                    </div>
-                </div>
-            </div>
-        </div>
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner" role="listbox">
 
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <div class="panel panel-default">
-                    <div class="panel-heading text-center">
-                        <div class="pull-left">
-                            <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
-                        </div>
-                        <label>Stock Details</label>
-
-                    </div>
-                    <div class="panel-body">
-                        <ul class="nav nav-pills">
-                            <li class="active"><a data-toggle="pill" href="#currentStock"><span class="glyphicon glyphicon-dashboard"></span> Current Stock</a></li>
-                            <li><a data-toggle="pill" href="#historicalCharts"><span class="glyphicon glyphicon-stats"></span> Historical Charts</a></li>
-                            <li><a data-toggle="pill" href="#newsFeeds"><span class="glyphicon glyphicon-link"></span> News Feeds</a></li>
-                        </ul>
-
-                        <div class="tab-content">
-                            <div id="currentStock" class="tab-pane fade in active">
-                                <h3>HOME</h3>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                            </div>
-                            <div id="historicalCharts" class="tab-pane fade">
-                                <h3>Menu 1</h3>
-                                <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                            </div>
-                            <div id="newsFeeds" class="tab-pane fade">
-                                <h3>Menu 2</h3>
-                                <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+                <div class="item active">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <label>Favorite List</label>
+                                    <div class="pull-right">
+                                        Automatic Refresh:
+                                        <input type="checkbox" data-toggle="toggle">
+                                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
+                                        <button type="submit" class="btn btn-default" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></button>
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table table-striped">
+                                        <tr>
+                                            <th>Symbol</th>
+                                            <th>Company Name</th>
+                                            <th>Stock Price</th>
+                                            <th>Change (Change Percent)</th>
+                                            <th>Market Cap</th>
+                                            <th></th>
+                                        </tr>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <div class="item">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="panel panel-default">
+                                <div class="panel-heading text-center">
+                                    <div class="pull-left">
+                                        <button type="submit" class="btn btn-default" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></button>
+                                    </div>
+                                    <label>Stock Details</label>
+
+                                </div>
+                                <div class="panel-body">
+                                    <ul class="nav nav-pills">
+                                        <li class="active"><a data-toggle="pill" href="#currentStock"><span class="glyphicon glyphicon-dashboard"></span> Current Stock</a></li>
+                                        <li><a data-toggle="pill" href="#historicalCharts"><span class="glyphicon glyphicon-stats"></span> Historical Charts</a></li>
+                                        <li><a data-toggle="pill" href="#newsFeeds"><span class="glyphicon glyphicon-link"></span> News Feeds</a></li>
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        <div id="currentStock" class="tab-pane fade in active">
+                                            <h3>HOME</h3>
+                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                                        </div>
+                                        <div id="historicalCharts" class="tab-pane fade">
+                                            <h3>Menu 1</h3>
+                                            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                        </div>
+                                        <div id="newsFeeds" class="tab-pane fade">
+                                            <h3>Menu 2</h3>
+                                            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
     </div>
 
+    <script>
+        $("[name='my-checkbox']").bootstrapSwitch();
 
-
+    </script>
 </body>
 
 </html>
