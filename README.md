@@ -1,3 +1,2 @@
 # Stock Search
 
-![](spec.png)
