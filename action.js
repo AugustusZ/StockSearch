@@ -31,13 +31,12 @@ $(function () {
 $(function () {
     $("form").submit(function(event) {
         event.preventDefault();
-        // 
+        // validation for needed here
         $("#message").html("");
         setCurrentStock();
         $("#myCarousel").carousel(1);
         addStockChart();
     });
-
 });
 
 function addStockChart() {
@@ -46,9 +45,7 @@ function addStockChart() {
     src += '&lang=en-US';
     src += '&width=' + $("#stockDetails").innerWidth();
     src += '&height=' + $("#stockDetails").innerHeight();
-    console.log(src);
     $("#stockChartImage").attr('src',src);
-    // $("#stockChart").prepend('<img src=' + src + '>');
 }
 
 function setCurrentStock() 

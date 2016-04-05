@@ -13,8 +13,14 @@ body {
     background-position: center center;
 }
 
-#shareBotton {
+#shareButton {
 	cursor: pointer;
 	width: 46px;
 	height: 46px;
+}
+
+#favoriteStar {
+	font-size: 180%;
+	color: white;
+	text-shadow: -0.5px -0.5px #000, 0.5px -0.5px #000, -0.5px 0.5px #000, 0.5px 0.5px #000;
 }
