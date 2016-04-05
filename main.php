@@ -1,14 +1,13 @@
 <?php
     header("Access-Control-Allow-Origin: *");
-    if (isset($_GET["symbol"])) { 
-        echo autocomplete_list($_GET["symbol"]); 
-    } 
 
-    function autocomplete_list($symbol) {
-        $markitondemandURL = "http://dev.markitondemand.com/MODApis/Api/v2/Lookup/json?input=".urlencode($symbol);
-        $json_string = file_get_contents($markitondemandURL); 
-//        $json_obj = json_decode($json_string);
-        return $json_string;
+	$lookup_api_url = "http://dev.markitondemand.com/MODApis/Api/v2/Lookup/json?input=";
+	$quote_api_url = "http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol=";
+
+    if (isset($_GET["input"])) { 
+        echo file_get_contents($lookup_api_url.urlencode($_GET["input"]));
+    } else if (isset($_GET["symbol"])) {
+    	echo file_get_contents($quote_api_url.urlencode($_GET["symbol"]));
     }
 
 ?>

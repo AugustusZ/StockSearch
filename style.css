@@ -2,3 +2,19 @@ body {
     padding-top: 10px;
     background-color: #1c506f;
 }
+
+.indicator {
+	width: 20px;
+	height: 20px;
+}
+
+.icon-fb {
+    background-image: url("fb.ico");
+    background-position: center center;
+}
+
+#shareBotton {
+	cursor: pointer;
+	width: 46px;
+	height: 46px;
+}
