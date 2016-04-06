@@ -31,24 +31,72 @@ $(function () {
 $(function () {
     $("form").submit(function(event) {
         event.preventDefault();
-        // validation for needed here
+        var what = $("#inputText").val();
+        // validation for 'what' needed here
+
         $("#message").html("");
-        setCurrentStock();
+        setCurrentStock(what);
+        setNewsFeeds(what);
         $("#myCarousel").carousel(1);
-        addStockChart();
+        addStockChart(what); // bug: size parameters are unavailable before cartousel slides
     });
 });
 
-function addStockChart() {
+// [ News Feeds ] functions ////
+
+function setNewsFeeds(what) {
+    $.ajax
+    ({
+        type: "GET",
+        url: server_url,
+        data: 
+        {
+            query: what
+        },
+        dataType: "json",
+        success: function(data)
+        {   
+            formatNewsFeeds(data); 
+        }   
+    })
+}
+
+function formatNewsFeeds(data) {
+    var entries = data.d.results;
+    var html = '';
+    for (var key in entries) {
+        html += formateOneNewsFeed(entries[key]);
+    }
+    $("#newsFeeds").html(html);
+}
+
+function formateOneNewsFeed(entry) {
+    var html = '<div class="well">';
+    html += '<p><a class="newsFeedsTitle text-primary" href="' + entry.Url + '">' + entry.Title + '</a></p>';
+    console.log(html);
+    html += '<p class="newsFeedsDescription">' + entry.Description + '</p>';
+    html += '<br>';
+    html += '<p class="newsFeedsSource"><strong>Publisher: ' + entry.Source + '</strong></p>';
+    html += '<p class="newsFeedsDate"><strong>Date: ' + moment(entry.Date).format('DD MMMM YYYY hh:mm:ss') + '</strong></p>';
+    html += "</div>";
+    return html;
+
+}
+
+/////////////////////////////////
+
+// [ Current Stock ] functions // 
+
+function addStockChart(what) {
     var src = 'http://chart.finance.yahoo.com/t?s=';
-    src += $("#inputText").val();
+    src += what;
     src += '&lang=en-US';
     src += '&width=' + $("#stockDetails").innerWidth();
     src += '&height=' + $("#stockDetails").innerHeight();
     $("#stockChartImage").attr('src',src);
 }
 
-function setCurrentStock() 
+function setCurrentStock(what) 
 {
     $.ajax
     ({
@@ -56,7 +104,7 @@ function setCurrentStock()
         url: server_url,
         data: 
         {
-            symbol: $("#inputText").val()
+            symbol: what
         },
         dataType: "json",
         success: function(data)
@@ -69,7 +117,6 @@ function setCurrentStock()
         }   
     })
 }
-
 
 function formatCurrentStock(data) {
     $("#Name").html(data.Name);
@@ -128,6 +175,9 @@ function formatTime(timestamp) {
     return moment(timestamp).format('DD MMMM YYYY, hh:mm:ss a');
 }
 
+/////////////////////////////
+
+// Other events
 function resetForm() {
     // CLEAR button: This button must clear the text field, resets the carousel to the favorite list and clear all validation errors if present.
 

@@ -8,11 +8,6 @@ body {
 	height: 20px;
 }
 
-.icon-fb {
-    background-image: url("fb.ico");
-    background-position: center center;
-}
-
 #shareButton {
 	cursor: pointer;
 	width: 46px;
@@ -24,3 +19,4 @@ body {
 	color: white;
 	text-shadow: -0.5px -0.5px #000, 0.5px -0.5px #000, -0.5px 0.5px #000, 0.5px 0.5px #000;
 }
+
