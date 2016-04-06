@@ -56,25 +56,25 @@ function setNewsFeeds(what) {
         dataType: "json",
         success: function(data)
         {   
-            formatNewsFeeds(data); 
+            formatNewsFeeds(data, what); 
         }   
     })
 }
 
-function formatNewsFeeds(data) {
+function formatNewsFeeds(data, what) {
     var entries = data.d.results;
     var html = '';
     for (var key in entries) {
-        html += formateOneNewsFeed(entries[key]);
+        html += formateOneNewsFeed(entries[key], what);
     }
     $("#newsFeeds").html(html);
 }
 
-function formateOneNewsFeed(entry) {
+function formateOneNewsFeed(entry, what) {
     var html = '<div class="well">';
+
     html += '<p><a class="newsFeedsTitle text-primary" href="' + entry.Url + '">' + entry.Title + '</a></p>';
-    console.log(html);
-    html += '<p class="newsFeedsDescription">' + entry.Description + '</p>';
+    html += '<p class="newsFeedsDescription">' + entry.Description.replace(what, '<strong>' + what + '</strong>') + '</p>';
     html += '<br>';
     html += '<p class="newsFeedsSource"><strong>Publisher: ' + entry.Source + '</strong></p>';
     html += '<p class="newsFeedsDate"><strong>Date: ' + moment(entry.Date).format('DD MMMM YYYY hh:mm:ss') + '</strong></p>';
