@@ -33,15 +33,188 @@ $(function () {
         event.preventDefault();
         var what = $("#inputText").val();
         // validation for 'what' needed here
+        $("#myCarousel").carousel(1);
 
         $("#message").html("");
         setCurrentStock(what);
+        setStockChart(what); // bug: size parameters are unavailable before cartousel slides
         setNewsFeeds(what);
-        $("#myCarousel").carousel(1);
-        addStockChart(what); // bug: size parameters are unavailable before cartousel slides
+        setHistoricalCharts(what);
+
     });
 });
 
+// [ Historical Charts ] functions //
+
+function setHistoricalCharts(what) {
+    
+    var Success = false;
+    $.ajax
+    ({
+        beforeSend: function() {
+            $("#historicalCharts").html("Loading chart...");
+        },
+        type: "GET",
+        url: server_url,
+        data: 
+        {
+            parameters: getParameterJsonString(what)
+        },
+        dataType: "json",
+        success: function(data)
+        {   
+            if (!data || data.Message) {
+                console.error("Error: ", data.Message);
+                $("#historicalCharts").html("No chart for <strong>" + what + "</strong>.");
+                return Success;
+            }
+            drawHistoricalCharts(data, what); 
+            Success = true;//doesnt goes here
+        },
+        error: function(textStatus, errorThrown) {
+            Success = false;//doesnt goes here
+        }  
+    })
+    return Success;
+}
+
+function getParameterJsonString(what) {
+    var parameterJson = {
+        Normalized: false,
+        NumberOfDays: 1096,
+        DataPeriod: "Day",
+        Elements: [{
+                Symbol: what,
+                Type: "price",
+                Params: ["ohlc"] 
+        }]
+    }
+    return JSON.stringify(parameterJson);
+}
+
+
+// from: https://goo.gl/4hG9VA
+
+function _fixDate(dateIn) {
+    var dat = new Date(dateIn);
+    return Date.UTC(dat.getFullYear(), dat.getMonth(), dat.getDate());
+};
+
+function _getOHLC(json) {
+    var dates = json.Dates || [];
+    var elements = json.Elements || [];
+    var chartSeries = [];
+
+    if (elements[0]){
+
+        for (var i = 0, datLen = dates.length; i < datLen; i++) {
+            var dat = _fixDate( dates[i] );
+            var pointData = [
+                dat,
+                elements[0].DataSeries['open'].values[i],
+                elements[0].DataSeries['high'].values[i],
+                elements[0].DataSeries['low'].values[i],
+                elements[0].DataSeries['close'].values[i]
+            ];
+            chartSeries.push( pointData );
+        };
+    }
+    return chartSeries;
+};
+
+function drawHistoricalCharts(data, what) {
+    //console.log(data)
+    // split the data set into ohlc and volume
+    var ohlc = _getOHLC(data);
+
+    // set the allowed units for data grouping
+    var groupingUnits = [[
+        'week',                         // unit name
+        [1]                             // allowed multiples
+    ], [
+        'month',
+        [1, 2, 3, 4, 6]
+    ]];
+
+    // create the chart
+    $('#historicalCharts').highcharts('StockChart', {
+        rangeSelector: {
+            selected: 0,
+            inputEnabled: false,
+            allButtonEnabled: true,
+
+            buttons: [{
+                type: 'week', count: 1, text: '1w'
+            }, {
+                type: 'month', count: 3, text: '3m'
+            }, {
+                type: 'month', count: 6, text: '6m'
+            }, {
+                type: 'ytd', text: 'YTD'
+            }, {
+                type: 'year', count: 1, text: '1y'
+            }, {
+                type: 'all', text: 'All'
+            }]
+            // enabled: false
+        },
+
+        title: {
+            text: what + ' Historical Price'
+        },
+        xAxis: {
+            type: 'datetime',
+            dateTimeLabelFormats: {
+                day: '%e of %b'
+            }
+        },
+        yAxis: [{
+            title: {
+                text: 'Stock Value'
+            },
+            height: 300,
+            lineWidth: 2
+        }],
+        
+        series: [{
+            type: 'area',
+            name: what,
+            data: ohlc,
+            dataGrouping: {
+                units: groupingUnits
+            },
+            tooltip : {
+                valueDecimals : 2,
+                valuePrefix: '$'
+            },
+            fillColor : {
+                linearGradient : {
+                    x1: 0,
+                    y1: 0,
+                    x2: 0,
+                    y2: 1
+                },
+                stops : [
+                    [0, Highcharts.getOptions().colors[0]],
+                    [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+            }
+        }],
+        credits: {
+            enabled: true
+        },
+        navigation: {
+            buttonOptions: {
+                enabled: false
+            }
+        }
+    });
+};
+
+$("#highcharts-0").ready(function(){
+    $('#historicalCharts').highcharts().reflow(); // where to put this sentence?
+});
+////////////////////////////////
 // [ News Feeds ] functions ////
 
 function setNewsFeeds(what) {
@@ -57,6 +230,9 @@ function setNewsFeeds(what) {
         success: function(data)
         {   
             formatNewsFeeds(data, what); 
+        },
+        error: function(data) {
+
         }   
     })
 }
@@ -79,15 +255,15 @@ function formateOneNewsFeed(entry, what) {
     html += '<p class="newsFeedsSource"><strong>Publisher: ' + entry.Source + '</strong></p>';
     html += '<p class="newsFeedsDate"><strong>Date: ' + moment(entry.Date).format('DD MMMM YYYY hh:mm:ss') + '</strong></p>';
     html += "</div>";
-    return html;
 
+    return html;
 }
 
 /////////////////////////////////
 
 // [ Current Stock ] functions // 
 
-function addStockChart(what) {
+function setStockChart(what) {
     var src = 'http://chart.finance.yahoo.com/t?s=';
     src += what;
     src += '&lang=en-US';
@@ -98,6 +274,7 @@ function addStockChart(what) {
 
 function setCurrentStock(what) 
 {
+    var Success = false;
     $.ajax
     ({
         type: "GET",
@@ -111,11 +288,17 @@ function setCurrentStock(what)
         {   
             if (data.Status != "SUCCESS") {
                 $("#message").html("No data for this symbol.");
+                Success = false;//doesnt goes here
             } else {
                 formatCurrentStock(data); 
+                Success = true;//doesnt goes here
             }
-        }   
+        },
+        error: function (textStatus, errorThrown) {
+            Success = false;//doesnt goes here
+        }  
     })
+    return Success;
 }
 
 function formatCurrentStock(data) {
@@ -182,7 +365,7 @@ function resetForm() {
     // CLEAR button: This button must clear the text field, resets the carousel to the favorite list and clear all validation errors if present.
 
     // 1 clear the text field and set focus
-    $("[type=text]").val("");
+    $("#inputText").val("");
     $("#inputText").focus();
 
     // 2 resets the carousel
