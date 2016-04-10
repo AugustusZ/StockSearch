@@ -32,6 +32,28 @@
 </head>
 
 <body>
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '1711542895751294',
+                xfbml      : false,
+                version    : 'v2.5'
+            });
+            // FB.ui({
+            //     method: 'share',
+            //     href: 'https://developers.facebook.com/docs/'
+            // }, function(response){});
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "http://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
     <div class="container">
         <div class="panel panel-default">
             <div class="panel-body">
@@ -119,7 +141,7 @@
                                 <div class="panel-body">
                                     <ul class="nav nav-pills">
                                         <li class="active"><a data-toggle="pill" href="#currentStock"><span class="glyphicon glyphicon-dashboard"></span><span class="hidden-xs"> Current</span> Stock</a></li>
-                                        <li><a data-toggle="pill" href="#historicalCharts"><span class="glyphicon glyphicon-stats"></span><span class="hidden-xs">  Historical</span> Charts</a></li>
+                                        <li><a data-toggle="pill" href="#historicalCharts" id="historicalChartsTab"><span class="glyphicon glyphicon-stats"></span><span class="hidden-xs">  Historical</span> Charts</a></li>
                                         <li><a data-toggle="pill" href="#newsFeeds"><span class="glyphicon glyphicon-link"></span> News<span class="hidden-xs">  Feeds</span></a></li>
                                     </ul>
                                     <hr>

@@ -40,7 +40,6 @@ $(function () {
         setStockChart(what); // bug: size parameters are unavailable before cartousel slides
         setNewsFeeds(what);
         setHistoricalCharts(what);
-
     });
 });
 
@@ -74,7 +73,7 @@ function setHistoricalCharts(what) {
         error: function(textStatus, errorThrown) {
             Success = false;//doesnt goes here
         }  
-    })
+    }) 
     return Success;
 }
 
@@ -136,84 +135,102 @@ function drawHistoricalCharts(data, what) {
         [1, 2, 3, 4, 6]
     ]];
 
-    // create the chart
-    $('#historicalCharts').highcharts('StockChart', {
-        rangeSelector: {
-            selected: 0,
-            inputEnabled: false,
-            allButtonEnabled: true,
+    var args = {
+            chart: {
+                reflow: true,
+                events: {
+                    load: function(event) {
+                        // alert ('Chart loaded');
+                    } 
+                }   
+            },
+            rangeSelector: {
+                selected: 0,
+                inputEnabled: false,
+                allButtonEnabled: true,
 
-            buttons: [{
-                type: 'week', count: 1, text: '1w'
-            }, {
-                type: 'month', count: 3, text: '3m'
-            }, {
-                type: 'month', count: 6, text: '6m'
-            }, {
-                type: 'ytd', text: 'YTD'
-            }, {
-                type: 'year', count: 1, text: '1y'
-            }, {
-                type: 'all', text: 'All'
-            }]
-            // enabled: false
-        },
+                buttons: [{
+                    type: 'week', count: 1, text: '1w'
+                }, {
+                    type: 'month', count: 3, text: '3m'
+                }, {
+                    type: 'month', count: 6, text: '6m'
+                }, {
+                    type: 'ytd', text: 'YTD'
+                }, {
+                    type: 'year', count: 1, text: '1y'
+                }, {
+                    type: 'all', text: 'All'
+                }]
+                // enabled: false
+            },
 
-        title: {
-            text: what + ' Historical Price'
-        },
-        xAxis: {
-            type: 'datetime',
-            dateTimeLabelFormats: {
-                day: '%e of %b'
-            }
-        },
-        yAxis: [{
             title: {
-                text: 'Stock Value'
+                text: what + ' Historical Price'
             },
-            height: 300,
-            lineWidth: 2
-        }],
-        
-        series: [{
-            type: 'area',
-            name: what,
-            data: ohlc,
-            dataGrouping: {
-                units: groupingUnits
+            xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: {
+                    day: '%e of %b'
+                }
             },
-            tooltip : {
-                valueDecimals : 2,
-                valuePrefix: '$'
-            },
-            fillColor : {
-                linearGradient : {
-                    x1: 0,
-                    y1: 0,
-                    x2: 0,
-                    y2: 1
+            yAxis: [{
+                title: {
+                    text: 'Stock Value'
                 },
-                stops : [
-                    [0, Highcharts.getOptions().colors[0]],
-                    [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-                ]
+                height: 300,
+                lineWidth: 2
+            }],
+            
+            series: [{
+                type: 'area',
+                name: what,
+                data: ohlc,
+                dataGrouping: {
+                    units: groupingUnits
+                },
+                tooltip : {
+                    valueDecimals : 2,
+                    valuePrefix: '$'
+                },
+                fillColor : {
+                    linearGradient : {
+                        x1: 0,
+                        y1: 0,
+                        x2: 0,
+                        y2: 1
+                    },
+                    stops : [
+                        [0, Highcharts.getOptions().colors[0]],
+                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                    ]
+                }
+            }],
+            credits: {
+                enabled: true
+            },
+            navigation: {
+                buttonOptions: {
+                    enabled: false
+                }
             }
-        }],
-        credits: {
-            enabled: true
-        },
-        navigation: {
-            buttonOptions: {
-                enabled: false
-            }
-        }
-    });
+        };
+    // create the chart
+    $('#historicalCharts').highcharts('StockChart', args);
 };
 
-$("#highcharts-0").ready(function(){
-    $('#historicalCharts').highcharts().reflow(); // where to put this sentence?
+// $(function () {
+//     $('#historicalChartsTab').click(function () {
+//         alert("click");
+//         $('#historicalCharts').highcharts().reflow();
+//     });
+// });
+$(function () {
+    $("#highcharts-0").ready(function(){
+        // $('#historicalCharts').highcharts().reflow(); // where to put this sentence?
+    });
 });
+
 ////////////////////////////////
 // [ News Feeds ] functions ////
 
@@ -377,3 +394,46 @@ function resetForm() {
     // 4 disable next slide button
     $("#nextSlide").disabled = true;
 }
+
+$("#favoriteStar").click(function () {
+    var symbol = $("#Symbol").text();
+
+    if (isInFavoriteList(symbol)) {
+        $(this).css('color', 'white');
+        removeFromFavoriteList(symbol);
+    } else {
+        $(this).css('color', 'yellow');
+        addToFavoriteList(symbol);
+    }
+
+    console.log(getFavoriteList());
+}); 
+
+function getFavoriteList() {
+    return JSON.parse(localStorage.getItem("favoriteList"));
+}
+
+function addToFavoriteList(symbol) {
+    var favoriteList = getFavoriteList();
+    favoriteList.push(symbol);
+    localStorage.setItem("favoriteList", JSON.stringify(favoriteList));
+}
+
+function removeFromFavoriteList(symbol) {
+    var favoriteList = getFavoriteList();
+    var index = favoriteList.indexOf(symbol);
+    favoriteList.splice(index, 1);
+    localStorage.setItem("favoriteList", JSON.stringify(favoriteList));
+}
+
+function isInFavoriteList(symbol) {
+    var favoriteList = getFavoriteList();
+
+    if (favoriteList === null) {
+        localStorage.setItem("favoriteList", JSON.stringify([]));
+        return false;
+    }
+
+    return favoriteList.includes(symbol);
+}
+
