@@ -1,4 +1,5 @@
 var server_url = "http://stocksearh.appspot.com/main.php";
+symbols = [];
 
 $(function () {
     $("#inputText").autocomplete({
@@ -13,12 +14,14 @@ $(function () {
                 dataType: "json",
                 success: function (data) {
                     var labels_and_values = [];
+                    symbols = [];
                     for (var key in data) {
                         datum = data[key];
                         var entry = {};
                         entry["label"] = datum.Symbol + " - " + datum.Name + " ( " + datum.Exchange + " )";
                         entry["value"] = datum.Symbol;
                         labels_and_values.push(entry);
+                        symbols.push(datum.Symbol);
                     };
                     response(labels_and_values);
                 }
@@ -31,9 +34,17 @@ $(function () {
 $(function () {
     $("form").submit(function(event) {
         event.preventDefault();
-        var what = $("#inputText").val();
+        var what = $("#inputText").val().toUpperCase();
         // validation for 'what' needed here
-        doGet(what);
+        if (symbols.includes(what)) {
+            console.log(what + " is a valid entry")
+            doGet(what);
+        }
+        else {
+            console.log(symbols);
+            console.log(what + " is not a valud entry")
+            $("#message").html("Select a valid entry");
+        }
     });
 });
 
