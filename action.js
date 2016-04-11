@@ -33,15 +33,26 @@ $(function () {
         event.preventDefault();
         var what = $("#inputText").val();
         // validation for 'what' needed here
-        $("#myCarousel").carousel(1);
-
-        $("#message").html("");
-        setCurrentStock(what);
-        setStockChart(what); // bug: size parameters are unavailable before cartousel slides
-        setNewsFeeds(what);
-        setHistoricalCharts(what);
+        doGet(what);
     });
 });
+
+function doGet(what) {
+    $("#myCarousel").carousel(1);
+
+    $("#message").html("");
+    setCurrentStock(what);
+    setStockChart(what); // bug: size parameters are unavailable before carousel slides
+    setNewsFeeds(what);
+    setHistoricalCharts(what);
+    $("#nextSlide").prop( "disabled", false);
+    if (isInFavoriteList(what)) {
+        $("#favoriteStar").css('color','yellow');
+    } else {
+        $("#favoriteStar").css('color','white');
+    }
+
+}
 
 // [ Historical Charts ] functions //
 
@@ -152,6 +163,8 @@ function drawHistoricalCharts(data, what) {
                 buttons: [{
                     type: 'week', count: 1, text: '1w'
                 }, {
+                    type: 'month', count: 1, text: '1m'
+                }, {
                     type: 'month', count: 3, text: '3m'
                 }, {
                     type: 'month', count: 6, text: '6m'
@@ -162,7 +175,6 @@ function drawHistoricalCharts(data, what) {
                 }, {
                     type: 'all', text: 'All'
                 }]
-                // enabled: false
             },
 
             title: {
@@ -179,7 +191,6 @@ function drawHistoricalCharts(data, what) {
                     text: 'Stock Value'
                 },
                 height: 300,
-                lineWidth: 2
             }],
             
             series: [{
@@ -284,8 +295,8 @@ function setStockChart(what) {
     var src = 'http://chart.finance.yahoo.com/t?s=';
     src += what;
     src += '&lang=en-US';
-    src += '&width=' + $("#stockDetails").innerWidth();
-    src += '&height=' + $("#stockDetails").innerHeight();
+    src += '&width=' + 400;
+    src += '&height=' + 300;
     $("#stockChartImage").attr('src',src);
 }
 
@@ -317,6 +328,8 @@ function setCurrentStock(what)
     })
     return Success;
 }
+
+
 
 function formatCurrentStock(data) {
     $("#Name").html(data.Name);
@@ -357,18 +370,20 @@ function formatChanges(change, changePercent, id) {
         var color = '';
         var src = 'http://cs-server.usc.edu:45678/hw/hw8/images/';
 
-        if (changePercent > 0) {
-            color = 'green';
-            src += 'up.png';
+        if (changePercent == 0) {
+            color = 'black';
         } else {
-            color = 'red';
-            src += 'down.png';
+            if (changePercent > 0) {
+                color = 'green';
+                src += 'up.png';
+            } else {
+                color = 'red';
+                src += 'down.png';
+            }
+            html += ' <img class="indicator" src=' + src + '>';
         }
-
-        html += ' <img class="indicator" src=' + src + '>';
-        $(id).css('color', color);
     } 
-    return html;
+    return '<span style="color:' + color + '">' + html + '</span>';
 }
 
 function formatTime(timestamp) {
@@ -395,31 +410,45 @@ function resetForm() {
     $("#nextSlide").disabled = true;
 }
 
-$("#favoriteStar").click(function () {
+$("#favoriteStarButton").click(function () {
     var symbol = $("#Symbol").text();
 
+    if (!localStorage.getItem("favoriteList")) {
+        localStorage.setItem("favoriteList", JSON.stringify([]));
+    }
+
     if (isInFavoriteList(symbol)) {
-        $(this).css('color', 'white');
-        removeFromFavoriteList(symbol);
+        doRemove(symbol);
     } else {
-        $(this).css('color', 'yellow');
-        addToFavoriteList(symbol);
+        doAdd(symbol);
     }
 
     console.log(getFavoriteList());
 }); 
 
+function doRemove(symbol) {
+    $("#favoriteStar").css('color', 'white');
+    removeFromFavoriteListLocalStorage(symbol);
+    removeFromFavoriteListTable(symbol);
+}
+
+function doAdd(symbol) {
+    $("#favoriteStar").css('color', 'yellow');
+    addToFavoriteListLocalStorage(symbol);
+    addToFavoriteListTable(symbol);
+}
+
 function getFavoriteList() {
     return JSON.parse(localStorage.getItem("favoriteList"));
 }
 
-function addToFavoriteList(symbol) {
+function addToFavoriteListLocalStorage(symbol) {
     var favoriteList = getFavoriteList();
     favoriteList.push(symbol);
     localStorage.setItem("favoriteList", JSON.stringify(favoriteList));
 }
 
-function removeFromFavoriteList(symbol) {
+function removeFromFavoriteListLocalStorage(symbol) {
     var favoriteList = getFavoriteList();
     var index = favoriteList.indexOf(symbol);
     favoriteList.splice(index, 1);
@@ -428,12 +457,87 @@ function removeFromFavoriteList(symbol) {
 
 function isInFavoriteList(symbol) {
     var favoriteList = getFavoriteList();
-
-    if (favoriteList === null) {
-        localStorage.setItem("favoriteList", JSON.stringify([]));
-        return false;
-    }
-
     return favoriteList.includes(symbol);
 }
 
+function addToFavoriteListTable(symbol) {
+    var id = 'favoriteList-' + symbol;
+    var html = '<tr id="' + id + '">';
+    html += '<td><a onclick=\"doGet(\'' + symbol + '\')\" style="cursor:pointer">' + symbol + '</a></td>';
+    html += '<td id="' + id + '-Name' + '">' + $("#Name").html() + '</td>';
+    html += '<td id="' + id + '-LastPrice' + '">' + $("#LastPrice").html() + '</td>';
+    html += '<td id="' + id + '-Change' + '">' + $("#Change").html() + '</td>';
+    html += '<td id="' + id + '-MarketCap' + '">' + $("#MarketCap").html() + '</td>';
+    html += '<td>' + '<button type="submit" class="btn btn-default" ';
+    html += 'onclick=\"doRemove(\'' + symbol + '\')\"';//onclick="myFunction()"
+    html += '><span class="glyphicon glyphicon-trash"></span></button>' + '</td>';
+    html += '</tr>';
+    $("#favoriteListTable").append(html);
+}
+
+$(function () {
+    loadFavoriteListFromLocalStorage();
+});
+
+function loadFavoriteListFromLocalStorage() {
+    var favoriteList = getFavoriteList();
+    console.log(favoriteList);
+    for (var key in favoriteList) {
+        var symbol = favoriteList[key];
+        console.log("this symbol: " + symbol);
+        var id = 'favoriteList-' + symbol;
+        var html = '<tr id="' + id + '">';
+        html += '<td><a onclick=\"doGet(\'' + symbol + '\')\" style="cursor:pointer">' + symbol + '</a></td>';
+        html += '<td id="' + id + '-Name' + '">' + '</td>';
+        html += '<td id="' + id + '-LastPrice' + '">' + '</td>';
+        html += '<td id="' + id + '-Change' + '">' + '</td>';
+        html += '<td id="' + id + '-MarketCap' + '">' + '</td>';
+        html += '<td>' + '<button type="submit" class="btn btn-default" ';
+        html += 'onclick=\"doRemove(\'' + symbol + '\')\"';//onclick="myFunction()"
+        html += '><span class="glyphicon glyphicon-trash"></span></button>' + '</td>';
+        html += '</tr>';
+        $("#favoriteListTable").append(html);
+        setFavoriteListStockInfo(symbol);
+    }
+}
+
+function setFavoriteListStockInfo(what) 
+{
+    var Success = false;
+    $.ajax
+    ({
+        type: "GET",
+        url: server_url,
+        data: 
+        {
+            symbol: what
+        },
+        dataType: "json",
+        success: function(data)
+        {   
+            if (data.Status != "SUCCESS") {
+                $("#message").html("No data for this symbol.");
+                Success = false;//doesnt goes here
+            } else {
+                formatFavoriteListStockInfo(data); 
+                Success = true;//doesnt goes here
+            }
+        },
+        error: function (textStatus, errorThrown) {
+            Success = false;//doesnt goes here
+        }  
+    })
+    return Success;
+}
+
+function formatFavoriteListStockInfo(data) {
+    var id = '#favoriteList-' + data.Symbol;
+    $(id + '-Name').html(data.Name);
+    $(id + '-LastPrice').html(addDollarSign(data.LastPrice));
+    $(id + '-Change').html(formatChanges(data.Change, data.ChangePercent, id + '-Change'));
+    $(id + '-MarketCap').html(formatBigNumber(data.MarketCap));
+}
+
+function removeFromFavoriteListTable(symbol) {
+    $('#favoriteList-' + symbol).remove();
+}
