@@ -388,7 +388,7 @@ function formatChanges(change, changePercent, id) {
             html += ' <img class="indicator" src=' + src + '>';
         }
     } 
-    return '<span style="color:' + color + '">' + html + '</span>';
+    return '<span style="color:' + color + '" id="ChangeText">' + html + '</span>';
 }
 
 function formatTime(timestamp) {
@@ -558,6 +558,27 @@ function removeFromFavoriteListTable(symbol) {
 }
 
 // Other events
+function shareOnFacebook() {
+    FB.ui(  
+        {
+            method: "feed",
+            link: "http://dev.markitondemand.com/",
+            picture: $("#stockChartImage").prop('src'),
+            name: "Current Stock Price of " + $('#Name').text() + " is " + $('#LastPrice').text(),
+            description: "Stock Information of " + $('#Name').text() + " (" + $('#Symbol').text() + ")",
+            caption: "LAST PRICE: " + $('#LastPrice').text() + ", CHANGE: " + $('#ChangeText').text()
+        },
+
+        function(response){
+            if (response && !response.error_message) {
+              alert('Posted sucessfully');
+            } else {
+              alert('Not Posted');
+            }
+        }
+    );
+}
+
 function resetForm() {
     // CLEAR button: This button must clear the text field, resets the carousel to the favorite list and clear all validation errors if present.
 

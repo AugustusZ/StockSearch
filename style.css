@@ -10,8 +10,8 @@ body {
 
 #shareButton {
 	cursor: pointer;
-	width: 46px;
-	height: 46px;
+	width: 43px;
+	height: 43px;
 }
 
 #favoriteStar {
@@ -20,3 +20,11 @@ body {
 	text-shadow: -0.5px -0.5px #000, 0.5px -0.5px #000, -0.5px 0.5px #000, 0.5px 0.5px #000;
 }
 
+.clearfix {
+	padding-bottom: 0;
+}
+
+.padding-0 {
+	padding-right: 0;
+	padding-left: 0;
+}

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=0.9">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Homework 8</title>
 
@@ -60,14 +60,14 @@
             <div class="panel-body">
                 <h4 class="text-center">Stock Market Search</h4>
                 <form class="form" role="form">
-                    <div class="form-group col-lg-9">
+                    <div class="form-group col-lg-9 col-xs-12 padding-0">
                         <label class="control-label col-lg-4" for="inputText">Enter the stock name or symbol:<span class="text-danger">*</span>
                         </label>
                         <div class="col-lg-8">
                             <input type="text" class="form-control" name="symbol" id="inputText" placeholder="Apple Inc or AAPL" required autofocus>
                         </div>
                     </div>
-                    <div class="form-group col-lg-3">
+                    <div class="form-group col-lg-3 col-xs-12">
                         <button type="submit" name="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Get Quote</button>
                         <button type="reset" class="btn btn-default" onclick="resetForm()"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
                     </div>
@@ -75,10 +75,10 @@
                 <div>
                 </div>
                 <div>
-                    <div class="col-lg-offset-3 col-lg-6">
+                    <div class="col-lg-offset-3 col-lg-6 col-xs-12">
                         <div class="text-danger" id="message"></div>
                     </div>
-                    <div class=" col-lg-3">
+                    <div class=" col-lg-3 col-xs-12">
                         <label class="control-label">Powered By: </label>
                         <a href="https://www.markit.com/product/markit-on-demand"><img src="http://cs-server.usc.edu:45678/hw/hw8/images/mod-logo.png" height="17" width="150"></a>
                     </div>
@@ -102,7 +102,7 @@
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <div class="panel panel-default">
-                                <div class="panel-heading clearfix">
+                                <div class="panel-heading clearfix" >
                                     <label>Favorite List</label>
                                     <div class="pull-right">
                                         <span title="Automatically refresh your favorite list">
@@ -151,12 +151,12 @@
                                     <div class="tab-content">
                                         <div id="currentStock" class="tab-pane fade in active">
                                             <div class="container-fluid">
-                                                <div class="col-lg-6">
+                                                <div class="col-lg-6 col-xs-6">
                                                     <label>Stock Details</label>
                                                 </div>
                                                 <div class="col-lg-6">
                                                     <div class="pull-right">
-                                                        <a href="."><img id="shareButton" src="fb.ico"></a>
+                                                        <a onclick="shareOnFacebook()"><img id="shareButton" src="fb.png"></a>
                                                         <button type="submit" class="btn btn-default" id="favoriteStarButton"><span class="glyphicon glyphicon-star" id="favoriteStar"></span></button>
                                                     </div>
                                                 </div>
@@ -215,10 +215,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div id="historicalCharts" class="tab-pane fade">
-                                            <h3>Menu 1</h3>
-                                            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                                        </div>
+                                        <div id="historicalCharts" class="tab-pane fade"></div>
                                         <div id="newsFeeds" class="tab-pane fade"></div>
                                     </div>
                                 </div>
