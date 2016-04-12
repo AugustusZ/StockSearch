@@ -1,5 +1,9 @@
 var server_url = "http://stocksearh.appspot.com/main.php";
-symbols = [];
+var symbols = [];
+
+$(function () {
+    loadFavoriteListFromLocalStorage();
+});
 
 $(function () {
     $("#inputText").autocomplete({
@@ -30,7 +34,6 @@ $(function () {
     });
 });
 
-
 $(function () {
     $("form").submit(function(event) {
         event.preventDefault();
@@ -49,20 +52,7 @@ $(function () {
 });
 
 function doGet(what) {
-    $("#myCarousel").carousel(1);
-
-    $("#message").html("");
     setCurrentStock(what);
-    setStockChart(what); // bug: size parameters are unavailable before carousel slides
-    setNewsFeeds(what);
-    setHistoricalCharts(what);
-    $("#nextSlide").prop( "disabled", false);
-    if (isInFavoriteList(what)) {
-        $("#favoriteStar").css('color','yellow');
-    } else {
-        $("#favoriteStar").css('color','white');
-    }
-
 }
 
 // [ Historical Charts ] functions //
@@ -112,7 +102,6 @@ function getParameterJsonString(what) {
     }
     return JSON.stringify(parameterJson);
 }
-
 
 // from: https://goo.gl/4hG9VA
 
@@ -313,7 +302,6 @@ function setStockChart(what) {
 
 function setCurrentStock(what) 
 {
-    var Success = false;
     $.ajax
     ({
         type: "GET",
@@ -327,20 +315,28 @@ function setCurrentStock(what)
         {   
             if (data.Status != "SUCCESS") {
                 $("#message").html("No data for this symbol.");
-                Success = false;//doesnt goes here
             } else {
-                formatCurrentStock(data); 
-                Success = true;//doesnt goes here
+                $("#myCarousel").carousel(1);
+
+                setStockChart(what); 
+                setHistoricalCharts(what);
+                setNewsFeeds(what);
+
+                $("#message").html("");
+                formatCurrentStock(data);
+
+                $("#nextSlide").prop( "disabled", false);
+
+                if (isInFavoriteList(what)) {
+                    $("#favoriteStar").css('color','yellow');
+                } else {
+                    $("#favoriteStar").css('color','white');
+                }
+
             }
-        },
-        error: function (textStatus, errorThrown) {
-            Success = false;//doesnt goes here
-        }  
+        }, 
     })
-    return Success;
 }
-
-
 
 function formatCurrentStock(data) {
     $("#Name").html(data.Name);
@@ -365,10 +361,8 @@ function roundToTwo(n) {
 }
 
 function formatBigNumber(n) {
-    if (n > 1000000000000) return roundToTwo(n / 1000000000000) + ' Trillion';
-    else if (n > 1000000000) return roundToTwo(n / 1000000000) + ' Billion';
+    if (n > 1000000000) return roundToTwo(n / 1000000000) + ' Billion';
     else if (n > 1000000) return roundToTwo(n / 1000000) + ' Million';
-    else if (n > 1000) return roundToTwo(n / 1000) + ' Thousand';
     return roundToTwo(n);
 }
 
@@ -403,24 +397,46 @@ function formatTime(timestamp) {
 
 /////////////////////////////
 
-// Other events
-function resetForm() {
-    // CLEAR button: This button must clear the text field, resets the carousel to the favorite list and clear all validation errors if present.
+var timerID;
+var refreshInterval = 5000;
 
-    // 1 clear the text field and set focus
-    $("#inputText").val("");
-    $("#inputText").focus();
+$("#autoRefreshToggle").change(function() {
+    if($(this).is(":checked")) {
+        timerID = setInterval(partialRefreshFavoriteList, refreshInterval);
+    }
+    else {
+        clearInterval(timerID);
+    }
+});
 
-    // 2 resets the carousel
-    $("#myCarousel").carousel(0);
-
-    // 3 clear all validation errors
-    $("#message").html("");
-
-    // 4 disable next slide button
-    $("#nextSlide").disabled = true;
+function partialRefreshFavoriteList() {
+    console.log("Partially Refresh Favorite List!");
+    var favoriteList = getFavoriteList();
+    for (var key in favoriteList) {
+        var symbol = favoriteList[key];
+        setPartialFavoriteListStockInfo(symbol);
+    }
 }
 
+function setPartialFavoriteListStockInfo(what) {
+    $.ajax({
+        type: "GET",
+        url: server_url,
+        data: 
+        {
+            symbol: what
+        },
+        dataType: "json",
+        success: function(data)
+        {   
+            var id = 'favoriteList-' + what;
+            $(id + '-LastPrice').html(addDollarSign(data.LastPrice));
+            $(id + '-Change').html(formatChanges(data.Change, data.ChangePercent, id + '-Change'));
+            console.log("Partial Favorite List Stock Info updated.");
+        },
+    })
+}
+// [ favorite list ]
 $("#favoriteStarButton").click(function () {
     var symbol = $("#Symbol").text();
 
@@ -486,10 +502,6 @@ function addToFavoriteListTable(symbol) {
     $("#favoriteListTable").append(html);
 }
 
-$(function () {
-    loadFavoriteListFromLocalStorage();
-});
-
 function loadFavoriteListFromLocalStorage() {
     var favoriteList = getFavoriteList();
     console.log(favoriteList);
@@ -526,17 +538,9 @@ function setFavoriteListStockInfo(what)
         dataType: "json",
         success: function(data)
         {   
-            if (data.Status != "SUCCESS") {
-                $("#message").html("No data for this symbol.");
-                Success = false;//doesnt goes here
-            } else {
                 formatFavoriteListStockInfo(data); 
                 Success = true;//doesnt goes here
-            }
         },
-        error: function (textStatus, errorThrown) {
-            Success = false;//doesnt goes here
-        }  
     })
     return Success;
 }
@@ -551,4 +555,20 @@ function formatFavoriteListStockInfo(data) {
 
 function removeFromFavoriteListTable(symbol) {
     $('#favoriteList-' + symbol).remove();
+}
+
+// Other events
+function resetForm() {
+    // CLEAR button: This button must clear the text field, resets the carousel to the favorite list and clear all validation errors if present.
+
+    // 1 clear the text field and set focus
+    $("#inputText").val("");
+    $("#inputText").focus();
+
+    // 2 resets the carousel and disable next slide button
+    $("#nextSlide").disabled = true;
+    $("#myCarousel").carousel(0);
+
+    // 3 clear all validation errors
+    $("#message").html("");
 }
