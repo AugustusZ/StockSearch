@@ -178,7 +178,7 @@ function drawHistoricalCharts(data, what) {
             },
 
             title: {
-                text: what + ' Historical Price'
+                text: what + ' Stock Value'
             },
             xAxis: {
                 type: 'datetime',
@@ -230,17 +230,30 @@ function drawHistoricalCharts(data, what) {
     $('#historicalCharts').highcharts('StockChart', args);
 };
 
-// $(function () {
-//     $('#historicalChartsTab').click(function () {
-//         alert("click");
-//         $('#historicalCharts').highcharts().reflow();
-//     });
+
+
+
+// $(window).resize(function() {
+//     chart = $('#historicalCharts').highcharts();
+//     height = chart.height();
+//     width = $("#historicalCharts").width();
+//     chart.setSize(width, height, doAnimation = true);
 // });
-$(function () {
-    $("#highcharts-0").ready(function(){
-        // $('#historicalCharts').highcharts().reflow(); // where to put this sentence?
-    });
+
+$('#historicalChartsTab').click(function () {
+    setTimeout(function () {
+        $('#historicalCharts').highcharts().reflow();
+    }, 160);
 });
+
+// $(".highcharts-background").css('width', $("#historicalCharts").width());
+// $("[id^=highcharts-].highcharts-container").ready(function(){
+//     // $('#historicalCharts').highcharts().reflow(); // where to put this sentence?
+//     if ($('#historicalCharts').hasClass("active")) {
+//         console.log("ready?");
+//     }
+// });
+
 
 ////////////////////////////////
 // [ News Feeds ] functions ////
@@ -394,6 +407,9 @@ function formatChanges(change, changePercent, id) {
 function formatTime(timestamp) {
     return moment(timestamp).format('DD MMMM YYYY, hh:mm:ss a');
 }
+
+
+
 
 /////////////////////////////
 
